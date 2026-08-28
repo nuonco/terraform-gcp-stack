@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 660" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <!-- canvas -->
+  <rect x="0" y="0" width="1040" height="660" fill="#f8fafc" rx="8"/>
+
+  <!-- external column (left) -->
+  <rect x="20" y="80" width="310" height="150" rx="10" fill="#e0f2fe" stroke="#0284c7"/>
+  <text x="175" y="106" text-anchor="middle" fill="#0c4a6e" font-weight="600" font-size="14">Nuon control plane</text>
+  <text x="175" y="128" text-anchor="middle" fill="#075985" font-size="12">runner API (runner_api_url)</text>
+  <text x="175" y="150" text-anchor="middle" fill="#075985" font-size="12">auth · settings · job polling</text>
+  <text x="175" y="168" text-anchor="middle" fill="#075985" font-size="12">heartbeats · logs · state backend</text>
+  <text x="175" y="196" text-anchor="middle" fill="#0c4a6e" font-size="12" font-weight="600">never connects inbound</text>
+
+  <rect x="20" y="260" width="310" height="120" rx="10" fill="#e2e8f0" stroke="#94a3b8"/>
+  <text x="175" y="286" text-anchor="middle" fill="#0f172a" font-weight="600">Artifact &amp; source hosts</text>
+  <text x="175" y="310" text-anchor="middle" fill="#334155" font-size="12">container registries (Artifact Registry, …)</text>
+  <text x="175" y="330" text-anchor="middle" fill="#334155" font-size="12">raw.githubusercontent.com · git remotes</text>
+  <text x="175" y="350" text-anchor="middle" fill="#334155" font-size="12">releases.hashicorp.com · helm repos</text>
+
+  <rect x="20" y="410" width="310" height="80" rx="10" fill="#e2e8f0" stroke="#94a3b8"/>
+  <text x="175" y="438" text-anchor="middle" fill="#0f172a" font-weight="600">Customer OTLP endpoint (optional)</text>
+  <text x="175" y="460" text-anchor="middle" fill="#334155" font-size="12">runner audit-log / telemetry export</text>
+
+  <!-- Internet -->
+  <rect x="370" y="20" width="640" height="40" rx="8" fill="#e2e8f0" stroke="#94a3b8"/>
+  <text x="690" y="45" text-anchor="middle" fill="#0f172a" font-weight="600">Internet</text>
+
+  <!-- GCP project / region -->
+  <rect x="360" y="80" width="660" height="560" rx="10" fill="#ffffff" stroke="#94a3b8" stroke-dasharray="6 4"/>
+  <text x="376" y="104" fill="#334155" font-weight="600">Customer GCP project · var.gcp_region</text>
+
+  <!-- VPC -->
+  <rect x="376" y="118" width="628" height="416" rx="10" fill="#f1f5f9" stroke="#64748b"/>
+  <text x="392" y="142" fill="#0f172a" font-weight="600">VPC network (custom mode)</text>
+
+  <!-- Cloud Router + NAT -->
+  <rect x="620" y="128" width="180" height="34" rx="8" fill="#fef3c7" stroke="#d97706"/>
+  <text x="710" y="150" text-anchor="middle" fill="#78350f" font-weight="600">Cloud Router + Cloud NAT</text>
+
+  <!-- regional subnets (single region, regional subnets) -->
+  <rect x="392" y="176" width="596" height="344" rx="8" fill="none" stroke="#94a3b8" stroke-dasharray="4 4"/>
+  <text x="406" y="196" fill="#64748b">Regional subnets (all subnets NAT'd, Private Google Access on)</text>
+
+  <!-- public subnet -->
+  <rect x="406" y="206" width="564" height="60" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+  <text x="420" y="228" fill="#14532d" font-weight="600">Public subnet 10.128.0.0/24</text>
+  <text x="420" y="248" fill="#166534" font-size="11">for internet-facing resources (load balancers)</text>
+
+  <!-- private subnet -->
+  <rect x="406" y="280" width="564" height="60" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="420" y="302" fill="#1e3a8a" font-weight="600">Private subnet 10.128.1.0/24</text>
+  <text x="420" y="322" fill="#1e40af" font-size="11">for workload infra (e.g. GKE)</text>
+
+  <!-- runner subnet -->
+  <rect x="406" y="354" width="564" height="152" rx="8" fill="#ede9fe" stroke="#7c3aed"/>
+  <text x="420" y="376" fill="#4c1d95" font-weight="600">Runner subnet 10.128.2.0/24</text>
+  <rect x="420" y="388" width="280" height="104" rx="6" fill="#ffffff" stroke="#7c3aed"/>
+  <text x="560" y="410" text-anchor="middle" fill="#4c1d95" font-weight="600">Nuon runner (GCE, MIG ×1)</text>
+  <text x="560" y="428" text-anchor="middle" fill="#5b21b6" font-size="11">Ubuntu 24.04 · e2-standard-4 · zone a</text>
+  <text x="560" y="444" text-anchor="middle" fill="#5b21b6" font-size="11">no external IP · egress via Cloud NAT</text>
+  <text x="560" y="460" text-anchor="middle" fill="#5b21b6" font-size="11">runs as the runner service account</text>
+  <text x="560" y="476" text-anchor="middle" fill="#5b21b6" font-size="11">config via instance metadata</text>
+
+  <!-- routes: runner -> NAT -> internet -->
+  <path d="M 700 420 C 780 420 810 300 810 166" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M 710 128 L 710 62" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- regional services row -->
+  <rect x="376" y="548" width="200" height="76" rx="8" fill="#fff7ed" stroke="#ea580c"/>
+  <text x="476" y="572" text-anchor="middle" fill="#7c2d12" font-weight="600">Secret Manager</text>
+  <text x="476" y="590" text-anchor="middle" fill="#9a3412" font-size="11">&lt;install-id&gt;-* secrets</text>
+  <text x="476" y="605" text-anchor="middle" fill="#9a3412" font-size="11">telemetry-export-config</text>
+
+  <rect x="590" y="548" width="200" height="76" rx="8" fill="#fff7ed" stroke="#ea580c"/>
+  <text x="690" y="568" text-anchor="middle" fill="#7c2d12" font-weight="600">Operation service accounts</text>
+  <text x="690" y="586" text-anchor="middle" fill="#9a3412" font-size="11">provision · maintenance · deprovision</text>
+  <text x="690" y="601" text-anchor="middle" fill="#9a3412" font-size="11">break-glass · custom</text>
+  <text x="690" y="616" text-anchor="middle" fill="#9a3412" font-size="11">impersonated per-job by the runner</text>
+
+  <rect x="804" y="548" width="200" height="76" rx="8" fill="#fff7ed" stroke="#ea580c"/>
+  <text x="904" y="572" text-anchor="middle" fill="#7c2d12" font-weight="600">GKE node pool SA</text>
+  <text x="904" y="592" text-anchor="middle" fill="#9a3412" font-size="11">least-privilege SA for GKE nodes</text>
+  <text x="904" y="607" text-anchor="middle" fill="#9a3412" font-size="11">(optional, created by default)</text>
+
+  <!-- runner -> regional services -->
+  <path d="M 476 506 L 476 548" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M 600 506 C 650 520 675 530 688 546" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- egress-only arrows runner -> external (exit left, rise in the gutter) -->
+  <path d="M 420 412 C 388 412 306 400 302 234" fill="none" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M 420 428 C 388 428 350 400 336 348" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M 420 444 C 390 444 360 448 336 450" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="392" y="530" fill="#0369a1" font-size="12" font-weight="600">outbound HTTPS only (poll for jobs)</text>
+</svg>
