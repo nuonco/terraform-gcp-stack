@@ -12,16 +12,6 @@ Then, apply.
 terraform init && terraform apply
 ```
 
-The module reads the install's project and region from the Nuon control plane. On a
-first apply, before any phone home has recorded them, set them explicitly:
-
-```hcl
-module "gcp_stack" {
-  source = "../../"
-
-  install_id = var.install_id
-
-  project_id = var.gcp_project_id
-  region     = var.gcp_region
-}
-```
+The module provisions into the project and region the `google` provider is
+configured with — the same values this example passes to the provider block — so
+nothing else needs setting.
