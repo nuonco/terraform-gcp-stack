@@ -19,23 +19,23 @@ variable "install_id" {
 ##
 ## GCP target.
 ##
-## Unlike AWS, where the control plane always holds the region, a GCP install can
-## be created without a project or region: the first provision records them from
-## the stack's phone home. So these read from the control plane by default and
-## exist as overrides for the first apply, when it has nothing to serve. Once an
-## install has provisioned once, leave them unset.
+## Both default to whatever the google provider is configured with, which is
+## also where the resources are actually created. Setting either to something
+## else provisions into one project or region while naming another in the
+## outputs and phone-home payload, so leave them unset unless you specifically
+## need that split.
 ##
 
 variable "project_id" {
   type        = string
   default     = ""
-  description = "GCP project to provision the stack in. When empty, read from the Nuon control plane. Must resolve to a non-empty value from one source or the other."
+  description = "GCP project to provision the stack in. When empty, taken from the google provider, then the Nuon control plane."
 }
 
 variable "region" {
   type        = string
   default     = ""
-  description = "GCP region to provision the stack in. When empty, read from the Nuon control plane. Must resolve to a non-empty value from one source or the other."
+  description = "GCP region to provision the stack in. When empty, taken from the google provider, then the Nuon control plane."
 
   # Catches a typo'd region before the google provider fails mid-apply with a
   # less obvious error. "" is allowed: it means "read from the control plane".
@@ -85,7 +85,7 @@ variable "region" {
       "us-west3",
       "us-west4",
     ], var.region)
-    error_message = "region must be a valid GCP region (e.g. us-central1, europe-west1, asia-east1), or empty to read it from the Nuon control plane."
+    error_message = "region must be a valid GCP region (e.g. us-central1, europe-west1, asia-east1), or empty to take it from the google provider."
   }
 }
 

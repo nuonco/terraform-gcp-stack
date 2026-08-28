@@ -22,6 +22,10 @@ data "stack_config" "this" {
   install_id = var.install_id
 }
 
+# The google provider's own configuration: the project and region the resources
+# below are actually created in.
+data "google_client_config" "current" {}
+
 locals {
   # identifiers
   nuon_install_id = data.stack_config.this.install_id
@@ -35,12 +39,23 @@ locals {
   runner_init_script_url = data.stack_config.this.gcp.runner_init_script_url
   phone_home_url         = data.stack_config.this.phone_home_url
 
-  # Caller override wins, then the control plane. Unlike the AWS module's region
-  # — always served — these can be empty on a first apply, before any phone home
-  # has recorded the install's target. A precondition on stack_phone_home.this
-  # rejects the case where neither source has a value.
-  gcp_project_id = var.project_id != "" ? var.project_id : data.stack_config.this.gcp.project_id
-  gcp_region     = var.region != "" ? var.region : data.stack_config.this.gcp.region
+  # Caller override wins, then the google provider, then the control plane.
+  #
+  # The provider is the primary source because it is the thing that actually
+  # creates the resources: anything else would provision into one project while
+  # naming another in the outputs and phone-home payload. The control plane is
+  # only a fallback for a provider configured without a default region, and is
+  # itself empty until the first phone home records the target.
+  gcp_project_id = (
+    var.project_id != "" ? var.project_id :
+    data.google_client_config.current.project != "" ? data.google_client_config.current.project :
+    data.stack_config.this.gcp.project_id
+  )
+  gcp_region = (
+    var.region != "" ? var.region :
+    data.google_client_config.current.region != "" ? data.google_client_config.current.region :
+    data.stack_config.this.gcp.region
+  )
 
   missing_gcp_target = compact([
     local.gcp_project_id == "" ? "project_id" : "",

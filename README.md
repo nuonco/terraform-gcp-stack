@@ -35,7 +35,7 @@ module "gcp_stack" {
 }
 ```
 
-The install's project and region are read from the Nuon control plane. On a first apply, before any phone home has recorded them, pass them explicitly with the `project_id` and `region` variables; later applies can omit them.
+The stack is provisioned into whatever project and region the `google` provider is configured with, and that target is reported back to Nuon by phone home. The `project_id` and `region` variables exist only to override it, which is rarely what you want: pointing them somewhere other than the provider provisions into one project while naming another in the outputs and phone-home payload.
 
 ## Architecture
 

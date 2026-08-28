@@ -90,12 +90,13 @@ resource "stack_phone_home" "this" {
   # checks.tf): a typo'd input name would otherwise be silently dropped by the
   # API's own validation and the value never set.
   lifecycle {
-    # Unlike the region on AWS, the GCP target can be absent from both sources
-    # on a first apply. Caught here rather than left to the google provider,
-    # which would fail partway through with a less actionable error.
+    # Only reachable when the google provider itself has no default for the
+    # value and neither the caller nor the control plane supplied one. Caught
+    # here rather than left to the provider, which would fail partway through
+    # with a less actionable error.
     precondition {
       condition     = length(local.missing_gcp_target) == 0
-      error_message = "the Nuon control plane has no ${join(" or ", local.missing_gcp_target)} recorded for this install yet; set ${join(" and ", local.missing_gcp_target)} on this module. Later applies can omit them — the first phone home records the target."
+      error_message = "no ${join(" or ", local.missing_gcp_target)} could be resolved for this install; set ${join(" and ", local.missing_gcp_target)} on the google provider, or on this module."
     }
 
     precondition {

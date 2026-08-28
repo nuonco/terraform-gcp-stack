@@ -13,8 +13,6 @@
 # operator overriding the target on purpose should not be hard-blocked. The
 # hard failure — neither source having a value at all — is a precondition on
 # stack_phone_home.this instead.
-data "google_client_config" "current" {}
-
 check "gcp_project_matches_stack_config" {
   assert {
     # Skipped when the control plane has nothing recorded yet (a first apply):
