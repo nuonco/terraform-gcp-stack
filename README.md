@@ -17,7 +17,7 @@ provider "stack" {}
 
 module "gcp_stack" {
   source  = "nuonco/stack/gcp"
-  version = "~> 0.1"
+  version = "~> 1.0"
 
   install_id = var.install_id
 
