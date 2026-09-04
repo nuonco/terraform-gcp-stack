@@ -110,10 +110,9 @@ output "secret_names" {
   description = "Map of <secret_name>_secret_name to fully qualified GCP Secret Manager resource names."
 }
 
-# Always present, even when no custom stacks are defined, so the shape matches
-# the other install-stack paths.
 output "custom_nested_stacks" {
-  value = {}
+  value       = local.custom_stack_outputs
+  description = "Outputs of curated custom stacks, keyed by stack name."
 }
 
 output "runner_instance_group" {

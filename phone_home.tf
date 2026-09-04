@@ -35,9 +35,7 @@ locals {
     runner_instance_group            = local.runner_instance_group
     install_inputs                   = local.install_inputs
     runner_enabled                   = var.runner_enabled
-    # Always present, even though this module defines no custom stacks, so the
-    # payload shape matches the other install-stack paths.
-    custom_nested_stacks = {}
+    custom_nested_stacks             = local.custom_stack_outputs
   }, local.all_secret_names)
 }
 
@@ -122,6 +120,21 @@ resource "stack_phone_home" "this" {
     precondition {
       condition     = length(local.unknown_role_keys) == 0
       error_message = "var.roles contains keys that match no role: ${join(", ", local.unknown_role_keys)}. Valid keys: ${join(", ", local.display_role_keys)}."
+    }
+
+    precondition {
+      condition     = length(local.duplicate_custom_stack_names) == 0
+      error_message = "custom stack names must be unique; duplicates: ${join(", ", local.duplicate_custom_stack_names)}."
+    }
+
+    precondition {
+      condition     = length(local.unsupported_custom_stack_modules) == 0
+      error_message = "unsupported custom stack modules: ${join(", ", local.unsupported_custom_stack_modules)}. Supported modules: ${join(", ", sort(tolist(local.supported_custom_stack_modules)))}."
+    }
+
+    precondition {
+      condition     = length(local.missing_custom_stack_input_names) == 0
+      error_message = "custom_stacks input_parameters reference inputs the install does not have: ${join(", ", local.missing_custom_stack_input_names)}. Known inputs: ${join(", ", keys(local.install_inputs))}."
     }
   }
 }

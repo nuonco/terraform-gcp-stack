@@ -57,10 +57,34 @@ The stack is provisioned into whatever project and region the `google` provider 
   - **Custom service accounts** – optional app-operation roles, same shape and gating as break-glass roles.
   - **GKE node pool service account** – a least-privilege SA for GKE nodes (logging, monitoring, Artifact Registry read), created by default; pass `gke_node_pool_sa_email` to use an existing one instead, or set `has_gke_node_pool = false` to skip it.
 - **Secrets** (`secrets.tf`) – Secret Manager entries named `<install-id>-<name>` for auto-generated secrets (63-char random values) and customer-provided secrets, plus an **empty** `<install-id>-telemetry-export-config` secret whose value the customer uploads out-of-band.
+- **Custom stacks** (`custom_stacks.tf`) – Instantiates supported curated modules selected by the app config. Module parameters are validated before apply, and outputs are reported under `custom_nested_stacks.<name>.outputs`.
 - **Phone home** (`phone_home.tf`) – A `stack_phone_home` resource that reports provisioning results and the effective install inputs back to Nuon. Its preconditions are where unknown or missing inputs, secrets, and roles fail the plan.
 
 > [!NOTE]
 > Because service account IDs are capped at 30 characters and don't support labels, the break-glass and custom SAs are named by a deterministic hash of the install ID and role name; the legible role name lives in the SA's display name and description.
+
+## Custom stack upgrades
+
+Migrate Terraform state before moving an existing curated stack from the classic `install-stacks/gcp` module to this module. The inner address remains `module.custom_bucket["<name>"].google_storage_bucket.main`, but its caller-module prefix changes. Use a root-module `moved` block or `terraform state mv` with the addresses from `terraform state list`.
+
+Custom buckets default `force_destroy` to `false`, so a missed state migration cannot silently delete a non-empty bucket. Renaming a stack or changing its curated module is a replacement and requires an explicit data-migration plan.
+
+## Custom stack catalog
+
+| Module            | Parameters                                             | Outputs                                  |
+| ----------------- | ------------------------------------------------------ | ---------------------------------------- |
+| `bucket`          | `location`, `force_destroy`, `versioning`              | `name`, `url`, `self_link`               |
+| `dns`             | `dns_name`, `visibility`, `description`, `force_destroy` | `name`, `name_servers`, `managed_zone_id` |
+| `kms`             | `location`, `rotation_period`                          | `id`, `key_ring`, `name`                 |
+| `service_account` | `display_name`, `description`                          | `email`, `unique_id`, `name`             |
+
+An empty `custom_stacks` list is an explicit no-op and creates no curated-module resources.
+
+Cloud KMS key rings and keys cannot be deleted from GCP. The `kms` module gives each apply a state-backed suffix so an
+install can be destroyed and applied again without an `AlreadyExists` failure, but previously created KMS resources
+remain in the project. Their output IDs must not be treated as stable across a destroy and re-apply.
+
+Rendered config parameters are applied first and install-input parameters override them. Terraform cannot turn a runtime stack `index` into per-instance graph edges: a `for_each` module cannot reference earlier instances of itself, and references in both directions between module collections form a cycle even when a runtime condition selects only one direction. This catalog currently has no output name that matches another module's accepted parameter name, so it does not add fake sequential dependencies or implicit output wiring.
 
 ## Network topology
 
