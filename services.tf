@@ -84,3 +84,11 @@ resource "google_project_service" "storage" {
   service            = "storage.googleapis.com"
   disable_on_destroy = false
 }
+
+resource "google_project_service" "cloud_kms" {
+  count = length(local.custom_kms_stacks) > 0 ? 1 : 0
+
+  project            = local.gcp_project_id
+  service            = "cloudkms.googleapis.com"
+  disable_on_destroy = false
+}

@@ -18,8 +18,12 @@ jobs:
         # unvalidated, and a listed one that does not exist fails the job.
         dir:
           - "."
+          - "modules/bucket"
+          - "modules/dns"
+          - "modules/kms"
           - "modules/network"
           - "modules/runner"
+          - "modules/service_account"
           - "examples/minimal"
           - "examples/byoc"
           - "examples/disable-runner"
@@ -44,3 +48,7 @@ jobs:
       - name: terraform validate
         working-directory: ${{ matrix.dir }}
         run: terraform validate
+
+      - name: terraform test
+        working-directory: ${{ matrix.dir }}
+        run: terraform test
