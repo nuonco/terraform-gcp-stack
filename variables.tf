@@ -99,6 +99,12 @@ variable "runner_enabled" {
   description = "Whether to provision the runner module (instance template, managed instance group). Set to false to skip the runner and only create networking, IAM, and secrets."
 }
 
+variable "enable_telemetry_ingress" {
+  type        = bool
+  default     = true
+  description = "Expose a private OTLP/HTTP endpoint on port 4318 for the runner Collector. Set to false to disable. Requires runner_enabled; does not enable the Collector itself."
+}
+
 variable "runner_machine_type" {
   type        = string
   default     = ""

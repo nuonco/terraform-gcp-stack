@@ -35,6 +35,7 @@ locals {
     runner_instance_group            = local.runner_instance_group
     install_inputs                   = local.install_inputs
     runner_enabled                   = var.runner_enabled
+    telemetry_endpoint               = local.telemetry_endpoint
     custom_nested_stacks             = local.custom_stack_outputs
   }, local.all_secret_names)
 }
@@ -59,6 +60,8 @@ resource "stack_phone_home" "this" {
     google_project_service.cloud_resource_manager,
     module.network,
     module.runner,
+    google_compute_forwarding_rule.telemetry,
+    google_compute_firewall.telemetry_health_check,
     google_service_account.runner,
     google_service_account.provision,
     google_service_account.maintenance,
