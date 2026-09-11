@@ -101,6 +101,14 @@ Rendered config parameters are applied first and install-input parameters overri
 - The network module gates its `runner_subnet_id` output on the Cloud NAT, so the runner instance cannot boot before its outbound route exists.
 - The runner requires no inbound connectivity; for the outbound destinations it must reach, see [Runners](https://docs.nuon.co/concepts/runners).
 
+## Private telemetry ingress
+
+A private OTLP/HTTP load balancer on port 4318 is created by default when `runner_enabled = true`. Set `enable_telemetry_ingress = false` to opt out. Nuon's install telemetry setting must also be enabled for collection.
+
+Clients must be in the same region and allowed by the existing internal firewall (`10.128.0.0/16`). The endpoint uses plaintext HTTP without authentication.
+
+Use `module.gcp_stack.telemetry_endpoint`, or `{{ .nuon.install_stack.outputs.telemetry_endpoint }}` in Nuon app components, as `OTEL_EXPORTER_OTLP_ENDPOINT` with protocol `http/protobuf`. The URL is stable across runner replacements and empty when ingress or the runner is disabled.
+
 ## Runner authentication
 
 On GCP, the Nuon runner authenticates with a **static API token**. GCP has no equivalent of AWS's signed Instance Identity Document, so the token is served by the control plane as part of the stack config and passed to the instance rather than exchanged for one at boot.

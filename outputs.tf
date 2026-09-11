@@ -123,3 +123,8 @@ output "runner_instance_group" {
 output "runner_enabled" {
   value = var.runner_enabled
 }
+
+output "telemetry_endpoint" {
+  value       = local.telemetry_endpoint
+  description = "Private OTLP/HTTP endpoint; empty when telemetry ingress or the runner is disabled."
+}
