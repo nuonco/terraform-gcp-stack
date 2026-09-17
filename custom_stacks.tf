@@ -1,6 +1,7 @@
 locals {
   supported_custom_stack_modules = toset([
     "bucket",
+    "cloudsql",
     "dns",
     "kms",
     "service_account",
@@ -23,6 +24,10 @@ locals {
     for stack in data.stack_config.this.custom_stacks : stack.name => stack
     if stack.module == "bucket" && !contains(local.duplicate_custom_stack_names, stack.name)
   }
+  custom_cloudsql_stacks = {
+    for stack in data.stack_config.this.custom_stacks : stack.name => stack
+    if stack.module == "cloudsql" && !contains(local.duplicate_custom_stack_names, stack.name)
+  }
   custom_dns_stacks = {
     for stack in data.stack_config.this.custom_stacks : stack.name => stack
     if stack.module == "dns" && !contains(local.duplicate_custom_stack_names, stack.name)
@@ -37,6 +42,31 @@ locals {
   }
 }
 
+resource "google_compute_global_address" "private_services" {
+  count = length(local.custom_cloudsql_stacks) > 0 ? 1 : 0
+
+  depends_on = [
+    google_project_service.compute,
+    google_project_service.service_networking,
+  ]
+
+  project       = local.gcp_project_id
+  name          = "${local.prefix}-private-services"
+  address_type  = "INTERNAL"
+  purpose       = "VPC_PEERING"
+  prefix_length = 16
+  network       = module.network.network_id
+}
+
+resource "google_service_networking_connection" "private_services" {
+  count = length(local.custom_cloudsql_stacks) > 0 ? 1 : 0
+
+  network                 = module.network.network_id
+  service                 = "servicenetworking.googleapis.com"
+  reserved_peering_ranges = [google_compute_global_address.private_services[0].name]
+  deletion_policy         = "ABANDON"
+}
+
 module "custom_bucket" {
   source   = "./modules/bucket"
   for_each = local.custom_bucket_stacks
@@ -47,6 +77,26 @@ module "custom_bucket" {
   name            = each.key
   gcp_project_id  = local.gcp_project_id
   gcp_region      = local.gcp_region
+  parameters = merge(each.value.parameters, {
+    for parameter_name, input_name in each.value.input_parameters :
+    parameter_name => lookup(local.install_inputs, input_name, "")
+  })
+}
+
+module "custom_cloudsql" {
+  source   = "./modules/cloudsql"
+  for_each = local.custom_cloudsql_stacks
+
+  depends_on = [
+    google_project_service.sqladmin,
+    google_service_networking_connection.private_services,
+  ]
+
+  nuon_install_id = local.nuon_install_id
+  name            = each.key
+  gcp_project_id  = local.gcp_project_id
+  gcp_region      = local.gcp_region
+  gcp_network_id  = module.network.network_id
   parameters = merge(each.value.parameters, {
     for parameter_name, input_name in each.value.input_parameters :
     parameter_name => lookup(local.install_inputs, input_name, "")
@@ -105,6 +155,7 @@ module "custom_service_account" {
 locals {
   custom_stack_outputs = merge(
     { for name, stack in module.custom_bucket : name => { outputs = stack.outputs } },
+    { for name, stack in module.custom_cloudsql : name => { outputs = stack.outputs } },
     { for name, stack in module.custom_dns : name => { outputs = stack.outputs } },
     { for name, stack in module.custom_kms : name => { outputs = stack.outputs } },
     { for name, stack in module.custom_service_account : name => { outputs = stack.outputs } },
