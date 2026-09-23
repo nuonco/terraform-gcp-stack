@@ -40,6 +40,10 @@ locals {
     for stack in data.stack_config.this.custom_stacks : stack.name => stack
     if stack.module == "service_account" && !contains(local.duplicate_custom_stack_names, stack.name)
   }
+  cloudsql_db_password_sources = merge(
+    { for k, v in google_secret_manager_secret_version.auto_generate : k => v.secret_data },
+    { for k, v in google_secret_manager_secret_version.customer : k => v.secret_data },
+  )
 }
 
 resource "google_compute_global_address" "private_services" {
@@ -97,10 +101,11 @@ module "custom_cloudsql" {
   gcp_project_id  = local.gcp_project_id
   gcp_region      = local.gcp_region
   gcp_network_id  = module.network.network_id
-  parameters = merge(each.value.parameters, {
+  db_password     = local.cloudsql_db_password_sources["db_password"]
+  parameters = { for k, v in merge(each.value.parameters, {
     for parameter_name, input_name in each.value.input_parameters :
     parameter_name => lookup(local.install_inputs, input_name, "")
-  })
+  }) : k => v if k != "db_password" }
 }
 
 module "custom_dns" {

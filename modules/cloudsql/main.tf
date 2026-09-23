@@ -58,6 +58,6 @@ resource "google_sql_user" "main" {
   project         = var.gcp_project_id
   name            = lookup(var.parameters, "db_user", "kitchensink")
   instance        = google_sql_database_instance.main.name
-  password        = var.parameters["db_password"]
+  password        = var.db_password
   deletion_policy = "ABANDON"
 }
