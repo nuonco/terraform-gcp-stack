@@ -74,6 +74,7 @@ Custom buckets default `force_destroy` to `false`, so a missed state migration c
 | Module            | Parameters                                             | Outputs                                  |
 | ----------------- | ------------------------------------------------------ | ---------------------------------------- |
 | `bucket`          | `location`, `force_destroy`, `versioning`              | `name`, `url`, `self_link`               |
+| `cloudsql`        | `tier`, `database_version`, `disk_size`, `db_name`, `db_user`, `db_password`, `deletion_protection`, `availability_type` | `DBEndpoint`, `DBPort`, `DBUser`, `DBName`, `connection_name`, `instance_name` |
 | `dns`             | `dns_name`, `visibility`, `description`, `force_destroy` | `name`, `name_servers`, `managed_zone_id` |
 | `kms`             | `location`, `rotation_period`                          | `id`, `key_ring`, `name`                 |
 | `service_account` | `display_name`, `description`                          | `email`, `unique_id`, `name`             |
