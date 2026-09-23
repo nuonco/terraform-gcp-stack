@@ -74,12 +74,14 @@ Custom buckets default `force_destroy` to `false`, so a missed state migration c
 | Module            | Parameters                                             | Outputs                                  |
 | ----------------- | ------------------------------------------------------ | ---------------------------------------- |
 | `bucket`          | `location`, `force_destroy`, `versioning`              | `name`, `url`, `self_link`               |
-| `cloudsql`        | `tier`, `database_version`, `disk_size`, `db_name`, `db_user`, `db_password`, `deletion_protection`, `availability_type` | `DBEndpoint`, `DBPort`, `DBUser`, `DBName`, `connection_name`, `instance_name` |
+| `cloudsql`        | `tier`, `database_version`, `disk_size`, `db_name`, `db_user`, `deletion_protection`, `availability_type` | `DBEndpoint`, `DBPort`, `DBUser`, `DBName`, `connection_name`, `instance_name` |
 | `dns`             | `dns_name`, `visibility`, `description`, `force_destroy` | `name`, `name_servers`, `managed_zone_id` |
 | `kms`             | `location`, `rotation_period`                          | `id`, `key_ring`, `name`                 |
 | `service_account` | `display_name`, `description`                          | `email`, `unique_id`, `name`             |
 
 An empty `custom_stacks` list is an explicit no-op and creates no curated-module resources.
+
+Cloud SQL uses the install's `db_password` Secret Manager secret for the database user. That value is not a stack parameter and is never included in module outputs.
 
 Cloud KMS key rings and keys cannot be deleted from GCP. The `kms` module gives each apply a state-backed suffix so an
 install can be destroyed and applied again without an `AlreadyExists` failure, but previously created KMS resources

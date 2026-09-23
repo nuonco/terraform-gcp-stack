@@ -10,9 +10,7 @@ run "defaults" {
     gcp_project_id  = "example-project"
     gcp_region      = "us-central1"
     gcp_network_id  = "projects/example-project/global/networks/install"
-    parameters = {
-      db_password = "test-password"
-    }
+    db_password     = "test-password"
   }
 
   assert {
@@ -105,11 +103,11 @@ run "parameter_overrides" {
     gcp_project_id  = "example-project"
     gcp_region      = "us-central1"
     gcp_network_id  = "projects/example-project/global/networks/install"
+    db_password     = "test-password"
     parameters = {
       availability_type   = "REGIONAL"
       database_version    = "POSTGRES_15"
       db_name             = ""
-      db_password         = "test-password"
       db_user             = "app"
       deletion_protection = "true"
       disk_size           = "50"
@@ -162,9 +160,9 @@ run "custom_database" {
     gcp_project_id  = "example-project"
     gcp_region      = "us-central1"
     gcp_network_id  = "projects/example-project/global/networks/install"
+    db_password     = "test-password"
     parameters = {
-      db_name     = "app"
-      db_password = "test-password"
+      db_name = "app"
     }
   }
 
@@ -188,9 +186,10 @@ run "rejects_missing_password" {
     gcp_project_id  = "example-project"
     gcp_region      = "us-central1"
     gcp_network_id  = "projects/example-project/global/networks/install"
+    db_password     = ""
   }
 
-  expect_failures = [var.parameters]
+  expect_failures = [var.db_password]
 }
 
 run "rejects_unknown_parameters" {
@@ -202,9 +201,9 @@ run "rejects_unknown_parameters" {
     gcp_project_id  = "example-project"
     gcp_region      = "us-central1"
     gcp_network_id  = "projects/example-project/global/networks/install"
+    db_password     = "test-password"
     parameters = {
-      db_password = "test-password"
-      typo        = "true"
+      typo = "true"
     }
   }
 
@@ -220,9 +219,7 @@ run "rejects_empty_network" {
     gcp_project_id  = "example-project"
     gcp_region      = "us-central1"
     gcp_network_id  = ""
-    parameters = {
-      db_password = "test-password"
-    }
+    db_password     = "test-password"
   }
 
   expect_failures = [var.gcp_network_id]
@@ -237,9 +234,9 @@ run "rejects_invalid_disk_size" {
     gcp_project_id  = "example-project"
     gcp_region      = "us-central1"
     gcp_network_id  = "projects/example-project/global/networks/install"
+    db_password     = "test-password"
     parameters = {
-      db_password = "test-password"
-      disk_size   = "small"
+      disk_size = "small"
     }
   }
 

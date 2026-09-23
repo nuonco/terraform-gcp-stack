@@ -23,6 +23,16 @@ variable "gcp_network_id" {
   }
 }
 
+variable "db_password" {
+  type      = string
+  sensitive = true
+
+  validation {
+    condition     = var.db_password != ""
+    error_message = "db_password must be set from the install db_password secret."
+  }
+}
+
 variable "parameters" {
   type    = map(string)
   default = {}
@@ -32,18 +42,12 @@ variable "parameters" {
       "availability_type",
       "database_version",
       "db_name",
-      "db_password",
       "db_user",
       "deletion_protection",
       "disk_size",
       "tier",
     ])) == 0
-    error_message = "parameters supports only availability_type, database_version, db_name, db_password, db_user, deletion_protection, disk_size, and tier."
-  }
-
-  validation {
-    condition     = lookup(var.parameters, "db_password", "") != ""
-    error_message = "parameters.db_password must be set."
+    error_message = "parameters supports only availability_type, database_version, db_name, db_user, deletion_protection, disk_size, and tier."
   }
 
   validation {
