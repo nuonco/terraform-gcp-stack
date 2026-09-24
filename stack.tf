@@ -85,6 +85,12 @@ locals {
   deprovision_policies        = data.stack_config.this.gcp.deprovision_policies
   deprovision_predefined_role = data.stack_config.this.gcp.deprovision_predefined_role
 
+  # The singular role keeps its existing binding; the rest bind separately so a
+  # reprovision only adds grants.
+  provision_extra_predefined_roles   = setsubtract(toset(data.stack_config.this.gcp.provision_predefined_roles), [local.provision_predefined_role])
+  maintenance_extra_predefined_roles = setsubtract(toset(data.stack_config.this.gcp.maintenance_predefined_roles), [local.maintenance_predefined_role])
+  deprovision_extra_predefined_roles = setsubtract(toset(data.stack_config.this.gcp.deprovision_predefined_roles), [local.deprovision_predefined_role])
+
   # Roles as the control plane serves them, with var.roles layered on top:
   # a value set there wins over the control plane's enabled flag in both
   # directions, so a caller can turn a role off or switch one on. If the same
