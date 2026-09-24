@@ -49,7 +49,7 @@ The stack is provisioned into whatever project and region the `google` provider 
 - **Runner** (`modules/runner`) – An instance template + single-instance managed instance group (zone `<region>-a`, proactive replace on update) running Ubuntu 24.04 with a 30 GB pd-balanced boot disk and no external IP. The instance runs as the runner service account with `cloud-platform` scope. Set `runner_enabled = false` to skip these resources.
 - **IAM** (`iam.tf`) –
   - **Runner service account** with a custom role granting `compute.instances.get`, so the control plane can verify the instance's identity during runner auth. The runner holds no standing workload permissions itself.
-  - **Operation service accounts**, each granting the runner `roles/iam.serviceAccountTokenCreator` so it can impersonate them per-job. Permissions come from custom roles (one per named policy) and/or a predefined role (e.g. `roles/editor`). Each is created only if the app config grants it permissions:
+  - **Operation service accounts**, each granting the runner `roles/iam.serviceAccountTokenCreator` so it can impersonate them per-job. Permissions come from custom roles (one per named policy) and/or predefined roles (e.g. `roles/editor`). Each is created only if the app config grants it permissions:
     - **provision** – used by provision workflows and secret syncs
     - **maintenance** – used by everything else (the default)
     - **deprovision** – used by deprovision workflows
