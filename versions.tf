@@ -11,11 +11,10 @@ terraform {
       source  = "hashicorp/random"
       version = ">= 3.0"
     }
-    # >= 0.8.0: stack_version_id on both the data source and the phone-home
-    # resource, without which a newly generated stack version produces no diff.
+    # >= 0.10.0: *_predefined_roles, so every predefined role is bound.
     stack = {
       source  = "nuonco/stack"
-      version = ">= 0.8.0"
+      version = ">= 0.10.0"
     }
   }
 }

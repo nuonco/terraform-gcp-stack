@@ -5,9 +5,9 @@ locals {
   # caller disable an operation role. Effectively disable-only: enabling a role
   # the app config grants no policies to would create an empty service account,
   # so the policy check still applies.
-  has_provision   = lookup(var.roles, "provision", true) && (length(local.provision_policies) > 0 || local.provision_predefined_role != "")
-  has_maintenance = lookup(var.roles, "maintenance", true) && (length(local.maintenance_policies) > 0 || local.maintenance_predefined_role != "")
-  has_deprovision = lookup(var.roles, "deprovision", true) && (length(local.deprovision_policies) > 0 || local.deprovision_predefined_role != "")
+  has_provision   = lookup(var.roles, "provision", true) && (length(local.provision_policies) > 0 || local.provision_predefined_role != "" || length(local.provision_extra_predefined_roles) > 0)
+  has_maintenance = lookup(var.roles, "maintenance", true) && (length(local.maintenance_policies) > 0 || local.maintenance_predefined_role != "" || length(local.maintenance_extra_predefined_roles) > 0)
+  has_deprovision = lookup(var.roles, "deprovision", true) && (length(local.deprovision_policies) > 0 || local.deprovision_predefined_role != "" || length(local.deprovision_extra_predefined_roles) > 0)
 
   # var.roles overrides are already folded into the `enabled` flag in stack.tf.
   enabled_break_glass_roles = { for k, v in local.break_glass_roles : k => v if v.enabled }
@@ -53,6 +53,19 @@ locals {
       "${rk}:${pk}" => { role_key = rk, policy_name = pk, permissions = pv }
     }
   ]...)
+  custom_role_extra_predefined = merge([
+    for rk, rv in local.enabled_custom_roles : {
+      for pr in setsubtract(toset(rv.predefined_roles), [rv.predefined_role]) :
+      "${rk}:${pr}" => { role_key = rk, role = pr }
+    }
+  ]...)
+  break_glass_role_extra_predefined = merge([
+    for rk, rv in local.enabled_break_glass_roles : {
+      for pr in setsubtract(toset(rv.predefined_roles), [rv.predefined_role]) :
+      "${rk}:${pr}" => { role_key = rk, role = pr }
+    }
+  ]...)
+
   break_glass_policy_role_ids = {
     for k in keys(local.break_glass_role_policies) :
     k => "nuon_bg_${md5("break_glass/${local.prefix}/${k}")}"

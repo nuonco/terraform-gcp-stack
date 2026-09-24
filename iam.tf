@@ -117,6 +117,13 @@ resource "google_project_iam_member" "provision_predefined_role" {
   member  = "serviceAccount:${google_service_account.provision[0].email}"
 }
 
+resource "google_project_iam_member" "provision_extra_predefined_role" {
+  for_each = local.provision_extra_predefined_roles
+  project  = local.gcp_project_id
+  role     = each.value
+  member   = "serviceAccount:${google_service_account.provision[0].email}"
+}
+
 resource "google_service_account_iam_member" "provision_token_creator" {
   count              = local.has_provision ? 1 : 0
   service_account_id = google_service_account.provision[0].name
@@ -166,6 +173,13 @@ resource "google_project_iam_member" "maintenance_predefined_role" {
   member  = "serviceAccount:${google_service_account.maintenance[0].email}"
 }
 
+resource "google_project_iam_member" "maintenance_extra_predefined_role" {
+  for_each = local.maintenance_extra_predefined_roles
+  project  = local.gcp_project_id
+  role     = each.value
+  member   = "serviceAccount:${google_service_account.maintenance[0].email}"
+}
+
 resource "google_service_account_iam_member" "maintenance_token_creator" {
   count              = local.has_maintenance ? 1 : 0
   service_account_id = google_service_account.maintenance[0].name
@@ -213,6 +227,13 @@ resource "google_project_iam_member" "deprovision_predefined_role" {
   project = local.gcp_project_id
   role    = local.deprovision_predefined_role
   member  = "serviceAccount:${google_service_account.deprovision[0].email}"
+}
+
+resource "google_project_iam_member" "deprovision_extra_predefined_role" {
+  for_each = local.deprovision_extra_predefined_roles
+  project  = local.gcp_project_id
+  role     = each.value
+  member   = "serviceAccount:${google_service_account.deprovision[0].email}"
 }
 
 resource "google_service_account_iam_member" "deprovision_token_creator" {
@@ -267,6 +288,13 @@ resource "google_project_iam_member" "break_glass_predefined_role" {
   member   = "serviceAccount:${google_service_account.break_glass[each.key].email}"
 }
 
+resource "google_project_iam_member" "break_glass_extra_predefined_role" {
+  for_each = local.break_glass_role_extra_predefined
+  project  = local.gcp_project_id
+  role     = each.value.role
+  member   = "serviceAccount:${google_service_account.break_glass[each.value.role_key].email}"
+}
+
 resource "google_service_account_iam_member" "break_glass_token_creator" {
   for_each           = local.enabled_break_glass_roles
   service_account_id = google_service_account.break_glass[each.key].name
@@ -317,6 +345,13 @@ resource "google_project_iam_member" "custom_predefined_role" {
   project  = local.gcp_project_id
   role     = each.value.predefined_role
   member   = "serviceAccount:${google_service_account.custom[each.key].email}"
+}
+
+resource "google_project_iam_member" "custom_extra_predefined_role" {
+  for_each = local.custom_role_extra_predefined
+  project  = local.gcp_project_id
+  role     = each.value.role
+  member   = "serviceAccount:${google_service_account.custom[each.value.role_key].email}"
 }
 
 resource "google_service_account_iam_member" "custom_token_creator" {
