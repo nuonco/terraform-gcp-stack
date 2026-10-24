@@ -44,12 +44,6 @@ variable "runner_api_url" {
   description = "Base URL of the Nuon runner API."
 }
 
-variable "runner_api_token" {
-  type        = string
-  sensitive   = true
-  description = "Static token the runner authenticates to the Nuon API with. Unlike AWS, GCP has no instance-identity exchange, so this is passed to the instance."
-}
-
 variable "runner_init_script_url" {
   type        = string
   description = "URL of the runner bootstrap script the startup script fetches and runs."

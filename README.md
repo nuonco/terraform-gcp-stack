@@ -114,17 +114,13 @@ Use `module.gcp_stack.telemetry_endpoint`, or `{{ .nuon.install_stack.outputs.te
 
 ## Runner authentication
 
-On GCP, the Nuon runner authenticates with a **static API token**. GCP has no equivalent of AWS's signed Instance Identity Document, so the token is served by the control plane as part of the stack config and passed to the instance rather than exchanged for one at boot.
+On GCP, the runner authenticates with its **instance identity**. The init script runs `runner mng fetch-token`, which POSTs a Google-signed identity token to `/v1/runner-auth/gcp`. No API token is provisioned or stored in instance metadata.
 
 The bootstrap process is as follows.
 
-1. The module reads `runner_api_token` from the `stack_config` data source; it never appears as a module variable.
-1. The instance template's startup script exports `NUON_RUNNER_ID`, `NUON_RUNNER_API_URL`, `NUON_RUNNER_API_TOKEN`, and `NUON_INSTALL_ID`, then downloads and runs the init script, retrying until it succeeds (the script is idempotent).
-1. The same non-secret values are also set as instance metadata (`nuon_runner_id`, `nuon_runner_api_url`, `nuon_install_id`) — the GCP mirror of the AWS module's instance tags.
+1. The startup script exports `NUON_RUNNER_ID`, `NUON_RUNNER_API_URL`, and `NUON_INSTALL_ID`, then downloads and runs the init script, retrying until it succeeds (the script is idempotent).
+1. The same values are also set as instance metadata (`nuon_runner_id`, `nuon_runner_api_url`, `nuon_install_id`) — the GCP mirror of the AWS module's instance tags.
 1. The runner service account holds `compute.instances.get` so the control plane can independently read the instance's `nuon_runner_id` metadata when verifying the runner's identity.
-
-> [!IMPORTANT]
-> The token reaches the instance through the instance template's metadata, and is therefore stored in Terraform state. The state backend must be encrypted and access-controlled. This is the same constraint that applies to any secret value passed through this module.
 
 ## License
 

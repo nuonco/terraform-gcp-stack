@@ -32,6 +32,5 @@ module "runner" {
   nuon_install_id        = local.nuon_install_id
   runner_id              = local.runner_id
   runner_api_url         = local.runner_api_url
-  runner_api_token       = local.runner_api_token
   runner_init_script_url = local.runner_init_script_url
 }
