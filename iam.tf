@@ -279,7 +279,7 @@ resource "google_service_account_iam_member" "break_glass_token_creator" {
 ###############################################################################
 
 resource "google_service_account" "custom" {
-  for_each = local.enabled_custom_roles
+  for_each = local.custom_service_accounts
   # account_id is a hash (see locals.tf); the legible key lives here so the SA
   # stays searchable (google_service_account has no labels field).
   account_id   = local.custom_account_ids[each.key]
@@ -313,7 +313,7 @@ resource "google_project_iam_member" "custom_custom_role" {
 }
 
 resource "google_project_iam_member" "custom_predefined_role" {
-  for_each = { for k, v in local.enabled_custom_roles : k => v if v.predefined_role != "" }
+  for_each = { for k, v in local.custom_service_accounts : k => v if v.predefined_role != "" }
   project  = local.gcp_project_id
   role     = each.value.predefined_role
   member   = "serviceAccount:${google_service_account.custom[each.key].email}"

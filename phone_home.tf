@@ -2,9 +2,13 @@ locals {
   # SA email / uniqueId maps for the phone-home payload. The numeric uniqueId is
   # the OIDC "sub" claim, used downstream to bind federated trust policies.
   break_glass_sa_emails     = { for k, v in google_service_account.break_glass : k => v.email }
-  custom_sa_emails          = { for k, v in google_service_account.custom : k => v.email }
   break_glass_sa_unique_ids = { for k, v in google_service_account.break_glass : k => v.unique_id }
-  custom_sa_unique_ids      = { for k, v in google_service_account.custom : k => v.unique_id }
+  custom_sa_emails          = { for k, v in google_service_account.custom : k => v.email if contains(keys(local.enabled_custom_roles), k) }
+  custom_sa_unique_ids      = { for k, v in google_service_account.custom : k => v.unique_id if contains(keys(local.enabled_custom_roles), k) }
+  workload_identities = {
+    for k, v in google_service_account.custom : k => { email = v.email, unique_id = v.unique_id }
+    if contains(keys(local.enabled_workload_identities), k)
+  }
 
   # Key names mirror what the legacy tfvars flow reported, so app templates
   # referencing `nuon.install_stack.outputs.*` resolve identically whether the
@@ -30,6 +34,7 @@ locals {
     break_glass_sa_unique_ids        = local.break_glass_sa_unique_ids
     custom_sa_emails                 = local.custom_sa_emails
     custom_sa_unique_ids             = local.custom_sa_unique_ids
+    workload_identities              = local.workload_identities
     gke_node_pool_sa_email           = local.gke_node_pool_sa_email
     gke_node_pool_sa_unique_id       = local.gke_node_pool_sa_unique_id
     runner_instance_group            = local.runner_instance_group
