@@ -148,6 +148,18 @@ variable "secrets" {
   description = "Secret overrides keyed by name, layered over the stack_config data source. Any field set here wins. Use this to supply secret values the control plane does not hold. A secret the app declares required fails the plan if it resolves to no value, as does a key naming a secret the app does not declare."
 }
 
+variable "workload_identities" {
+  type = map(object({
+    policies         = optional(map(list(string)), {})
+    permissions      = optional(list(string), [])
+    predefined_role  = optional(string, "")
+    predefined_roles = optional(list(string), [])
+    enabled          = optional(bool, true)
+  }))
+  default     = {}
+  description = "Service accounts for workloads running in the install (bound to Kubernetes service accounts by the app). Same shape as custom_roles and enabled by default, but the runner is never granted permission to impersonate them. A key here takes precedence over the same key served in custom_roles."
+}
+
 variable "roles" {
   type        = map(bool)
   default     = {}

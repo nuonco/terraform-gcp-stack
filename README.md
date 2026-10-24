@@ -55,6 +55,7 @@ The stack is provisioned into whatever project and region the `google` provider 
     - **deprovision** – used by deprovision workflows
   - **Break-glass service accounts** – optional, created from the roles the control plane serves and gated on `enabled`.
   - **Custom service accounts** – optional app-operation roles, same shape and gating as break-glass roles.
+  - **Workload identity service accounts** – optional, from `workload_identities`. Created like custom service accounts and reported under `workload_identities` in phone home, but the runner is never granted permission to impersonate them; the app binds them to Kubernetes service accounts. A key in `workload_identities` takes over the custom role with the same key without recreating its service account.
   - **GKE node pool service account** – a least-privilege SA for GKE nodes (logging, monitoring, Artifact Registry read), created by default; pass `gke_node_pool_sa_email` to use an existing one instead, or set `has_gke_node_pool = false` to skip it.
 - **Secrets** (`secrets.tf`) – Secret Manager entries named `<install-id>-<name>` for auto-generated secrets (63-char random values) and customer-provided secrets, plus an **empty** `<install-id>-telemetry-export-config` secret whose value the customer uploads out-of-band.
 - **Custom stacks** (`custom_stacks.tf`) – Instantiates supported curated modules selected by the app config. Module parameters are validated before apply, and outputs are reported under `custom_nested_stacks.<name>.outputs`.

@@ -95,6 +95,11 @@ output "custom_sa_unique_ids" {
   description = "Map of custom role name to service account numeric uniqueId."
 }
 
+output "workload_identities" {
+  value       = local.workload_identities
+  description = "Map of workload identity name to its service account email and numeric uniqueId."
+}
+
 output "install_inputs" {
   value       = local.install_inputs
   description = "Effective customer-facing input values: control-plane values merged with var.inputs overrides, as reported back to Nuon."
