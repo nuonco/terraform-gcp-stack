@@ -13,9 +13,8 @@
 ##
 ## Non-secret values are read by indexing data.stack_config.this DIRECTLY —
 ## never via one()/try() over the whole object. Routing the object through a
-## function collapses the sensitivity mark from the `secrets` and
-## `gcp.runner_api_token` attributes onto every sibling value, which would make
-## unrelated outputs sensitive.
+## function collapses the sensitivity mark from the `secrets` attribute onto
+## every sibling value, which would make unrelated outputs sensitive.
 ##
 
 data "stack_config" "this" {
@@ -35,7 +34,6 @@ locals {
   # runner
   runner_id              = data.stack_config.this.runner_id
   runner_api_url         = data.stack_config.this.runner_api_url
-  runner_api_token       = data.stack_config.this.gcp.runner_api_token
   runner_init_script_url = data.stack_config.this.gcp.runner_init_script_url
   phone_home_url         = data.stack_config.this.phone_home_url
 

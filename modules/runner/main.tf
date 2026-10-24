@@ -39,7 +39,6 @@ resource "google_compute_instance_template" "runner" {
       #!/bin/bash
       export NUON_RUNNER_ID=${var.runner_id}
       export NUON_RUNNER_API_URL=${var.runner_api_url}
-      export NUON_RUNNER_API_TOKEN=${var.runner_api_token}
       export NUON_INSTALL_ID=${var.nuon_install_id}
       # Retry the whole bootstrap until it succeeds. Transient failures
       # (apt mirror sync, network blips, etc.) shouldn't leave the runner
