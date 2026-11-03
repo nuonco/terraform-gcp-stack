@@ -48,7 +48,7 @@ The stack is provisioned into whatever project and region the `google` provider 
 - **Firewall rules** (`modules/network`) – All TCP/UDP/ICMP traffic allowed from `10.128.0.0/16` (a superset of the three subnets); all egress allowed to `0.0.0.0/0`. No inbound-from-internet rule exists.
 - **Runner** (`modules/runner`) – An instance template + single-instance managed instance group (zone `<region>-a`, proactive replace on update) running Ubuntu 24.04 with a 30 GB pd-balanced boot disk and no external IP. The instance runs as the runner service account with `cloud-platform` scope. Set `runner_enabled = false` to skip these resources.
 - **IAM** (`iam.tf`) –
-  - **Runner service account** with a custom role granting `compute.instances.get`, so the control plane can verify the instance's identity during runner auth. The runner holds no standing workload permissions itself.
+  - **Runner service account**, created per install. The control plane checks its email against the identity token during runner auth. The runner holds no standing workload permissions itself.
   - **Operation service accounts**, each granting the runner `roles/iam.serviceAccountTokenCreator` so it can impersonate them per-job. Permissions come from custom roles (one per named policy) and/or a predefined role (e.g. `roles/editor`). Each is created only if the app config grants it permissions:
     - **provision** – used by provision workflows and secret syncs
     - **maintenance** – used by everything else (the default)
@@ -121,7 +121,7 @@ The bootstrap process is as follows.
 
 1. The startup script exports `NUON_RUNNER_ID`, `NUON_RUNNER_API_URL`, and `NUON_INSTALL_ID`, then downloads and runs the init script, retrying until it succeeds (the script is idempotent).
 1. The same values are also set as instance metadata (`nuon_runner_id`, `nuon_runner_api_url`, `nuon_install_id`) — the GCP mirror of the AWS module's instance tags.
-1. The runner service account holds `compute.instances.get` so the control plane can independently read the instance's `nuon_runner_id` metadata when verifying the runner's identity.
+1. The runner sends its runner ID with the identity token. The control plane accepts it only if the token's project and service account match that runner's install stack outputs, so the runner service account needs no Compute permissions.
 
 ## License
 

@@ -13,12 +13,9 @@ module "runner" {
   source = "./modules/runner"
   count  = var.runner_enabled ? 1 : 0
 
-  # The runner's IAM bindings do not feed any value this module consumes, so
-  # nothing orders them ahead of the instance group implicitly. The subnet's
-  # NAT ordering is handled inside the network module's output.
+  # The subnet's NAT ordering is handled inside the network module's output.
   depends_on = [
     google_project_service.compute,
-    google_project_iam_member.runner_instance_read,
   ]
 
   prefix       = local.prefix

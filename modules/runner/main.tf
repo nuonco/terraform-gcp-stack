@@ -28,9 +28,9 @@ resource "google_compute_instance_template" "runner" {
   }
 
   # The nuon_* metadata keys are the GCP mirror of the AWS module's instance
-  # tags: the control plane reads nuon_runner_id back off the instance to verify
-  # the runner's identity, which is why they are set as metadata and not only
-  # exported inside the startup script.
+  # tags: the init script and the runner read nuon_runner_id from the metadata
+  # server to identify themselves, which is why they are set as metadata and not
+  # only exported inside the startup script.
   metadata = {
     nuon_runner_id      = var.runner_id
     nuon_runner_api_url = var.runner_api_url

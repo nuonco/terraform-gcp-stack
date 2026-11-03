@@ -36,7 +36,7 @@ variable "nuon_install_id" {
 
 variable "runner_id" {
   type        = string
-  description = "Nuon runner ID. Also set as the nuon_runner_id metadata key, which the control plane reads to verify the instance's identity."
+  description = "Nuon runner ID. Also set as the nuon_runner_id metadata key, which the runner reads to identify itself when it authenticates."
 }
 
 variable "runner_api_url" {
