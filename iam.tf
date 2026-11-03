@@ -12,26 +12,6 @@ resource "google_service_account" "runner" {
   ]
 }
 
-# init-mng-v2 auth: ctl-api independently reads the instance's nuon_runner_id
-# via the Compute API using the runner's own token (the GCP mirror of the AWS
-# ec2:DescribeTags grant), so the runner SA needs compute.instances.get.
-resource "google_project_iam_custom_role" "runner_instance_read" {
-  role_id     = "nuon_r_${md5("runner/${local.prefix}")}"
-  title       = "Nuon runner instance read for ${local.prefix}"
-  permissions = ["compute.instances.get"]
-
-  depends_on = [
-    google_project_service.compute,
-    google_project_service.secret_manager,
-  ]
-}
-
-resource "google_project_iam_member" "runner_instance_read" {
-  project = local.gcp_project_id
-  role    = google_project_iam_custom_role.runner_instance_read.id
-  member  = "serviceAccount:${google_service_account.runner.email}"
-}
-
 ###############################################################################
 # GKE node pool service account — least-privilege SA for GKE nodes
 ###############################################################################
