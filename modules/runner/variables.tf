@@ -46,5 +46,5 @@ variable "runner_api_url" {
 
 variable "runner_init_script_url" {
   type        = string
-  description = "URL of the runner bootstrap script the startup script fetches and runs."
+  description = "URL of the runner bootstrap script the startup script fetches and runs. A #sha256=<hex> fragment is checked against the downloaded file before it runs."
 }
