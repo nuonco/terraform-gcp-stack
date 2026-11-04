@@ -37,14 +37,29 @@ resource "google_compute_instance_template" "runner" {
     nuon_install_id     = var.nuon_install_id
     startup-script      = <<-EOT
       #!/bin/bash
+      set -euo pipefail
       export NUON_RUNNER_ID=${var.runner_id}
       export NUON_RUNNER_API_URL=${var.runner_api_url}
       export NUON_INSTALL_ID=${var.nuon_install_id}
+      # A #sha256=<hex> fragment is the checksum pinned when the URL was issued.
+      # curl never sends the fragment; it is only here so boot can verify the body.
+      raw='${var.runner_init_script_url}'
+      url="$${raw%%#*}"
+      checksum=""
+      case "$raw" in
+        *#sha256=*) checksum="$${raw##*#sha256=}" ;;
+      esac
       # Retry the whole bootstrap until it succeeds. Transient failures
       # (apt mirror sync, network blips, etc.) shouldn't leave the runner
       # permanently unprovisioned — init.sh is idempotent.
-      until curl -fsSL ${var.runner_init_script_url} | bash; do
+      until
+        tmp="$(mktemp)"
+        curl -fsSL --retry 5 --retry-all-errors --retry-delay 2 --max-time 60 -o "$tmp" "$url" &&
+        { [ -z "$checksum" ] || echo "$checksum  $tmp" | sha256sum -c -; } &&
+        bash "$tmp"
+      do
         echo "runner bootstrap failed, retrying in 30s"
+        rm -f "$tmp"
         sleep 30
       done
     EOT
