@@ -5,7 +5,7 @@ variable "prefix" {
 
 variable "region" {
   type        = string
-  description = "GCP region. The managed instance group is zonal, placed in <region>-a."
+  description = "GCP region. The managed instance group is zonal, placed in the region's first zone in alphabetical order."
 }
 
 variable "labels" {
