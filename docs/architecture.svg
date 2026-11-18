@@ -61,7 +61,7 @@
   <text x="420" y="376" fill="#4c1d95" font-weight="600">Runner subnet 10.128.2.0/24</text>
   <rect x="420" y="388" width="280" height="104" rx="6" fill="#ffffff" stroke="#7c3aed"/>
   <text x="560" y="410" text-anchor="middle" fill="#4c1d95" font-weight="600">Nuon runner (GCE, MIG ×1)</text>
-  <text x="560" y="428" text-anchor="middle" fill="#5b21b6" font-size="11">Ubuntu 24.04 · e2-standard-4 · zone a</text>
+  <text x="560" y="428" text-anchor="middle" fill="#5b21b6" font-size="11">Ubuntu 24.04 · e2-standard-4 · first zone</text>
   <text x="560" y="444" text-anchor="middle" fill="#5b21b6" font-size="11">no external IP · egress via Cloud NAT</text>
   <text x="560" y="460" text-anchor="middle" fill="#5b21b6" font-size="11">runs as the runner service account</text>
   <text x="560" y="476" text-anchor="middle" fill="#5b21b6" font-size="11">config via instance metadata</text>

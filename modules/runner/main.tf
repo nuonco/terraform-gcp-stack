@@ -57,10 +57,17 @@ resource "google_compute_instance_template" "runner" {
   }
 }
 
+# Zone letters are not contiguous across regions (us-east1 has no "a"), so pick
+# the first zone the region actually has. No status filter: a zone going DOWN
+# must not change the choice and force the group to be replaced.
+data "google_compute_zones" "available" {
+  region = var.region
+}
+
 resource "google_compute_instance_group_manager" "runner" {
   name               = "${var.prefix}-runner"
   base_instance_name = "${var.prefix}-runner"
-  zone               = "${var.region}-a"
+  zone               = sort(data.google_compute_zones.available.names)[0]
   target_size        = 1
 
   version {
